@@ -1,0 +1,66 @@
+# can't find path in this map
+
+# why this project use undirected graph 
+
+# djikstra , what happend when we remove break when we arrive to end 
+
+
+
+nb_drones: 10
+start_hub: start 0 0 [color=green]
+hub: waypoint1 1 0 [color=hmar zone=blocked]
+
+end_hub: goal 4 4 [color=red]
+
+connection: start-waypoint1 [color=red]
+connection: waypoint1-goal
+
+
+
+class drone:
+    id:int
+    drone_state:ZoneState = ZoneState.IDLE
+    path:list[zone]
+    path_index = 0
+    
+    def move():
+
+class zone: 
+    
+    zone_name
+    
+    zone_x
+    
+    zone_y
+    
+    capacity
+    
+    color:optional[str]
+    
+    current_drones:set[int]
+    
+    requests:List[int]
+
+    def _is_accessible(self):
+        return self.ZoneType != ZoneState.blocked
+    
+
+
+class ZoneType (Enum)
+class DroneState(Enum)
+ IDLE
+ MOVING
+ ARRIVED 
+ RESTRICTED
+ WAITING
+
+class graph
+    dict[zone_zones , zone()]
+    connection : dict[frozen_set(zone1, zone2) , connection]
+    get_connection(zone1_name , zone2_name)
+        return self.
+
+class connection :
+    zone1_name:str 
+    zone2_name:str 
+    max_link_capacity = 1
