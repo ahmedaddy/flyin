@@ -3,8 +3,7 @@ from utils import Utils
 from graph import Graph
 from simulation import Simulation
 import sys
-
-
+from visualizer import run_visualization
 def main():
     parser = Parser()
     map_file = sys.argv[1]
@@ -29,9 +28,10 @@ def main():
         #     graph, result['start_hub'].id, result['end_hub'].id)
         # print(path)
         sim = Simulation()
-        sim.simulate(graph, result['nb_drones'],
+        res = sim.simulate(graph, result['nb_drones'],
                      result['start_hub'].id,
                      result['end_hub'].id)
+        vislulizer = run_visualization(res, graph.zones)
         # print(graph.connections['start'])
         # graph.get_zones()
         # neighbors = graph.get_neighbors(result["start_hub"].id)

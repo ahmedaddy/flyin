@@ -239,12 +239,15 @@ class StartHubParser():
             raise ValueError(
                 "Start hub line not correctly formatted."
                 )
-        if not parts[1].isdigit() or not parts[2].isdigit():
+        try:
+            x = int(parts[1])
+            y = int(parts[2])
+        except ValueError:
             raise ValueError("Start hub coordinates must be integers.")
         obj = {
             "id": parts[0],
-            "x": int(parts[1]),
-            "y": int(parts[2]),
+            "x": x,
+            "y": y,
         }
         if len(parts) > 3:
             allowed = ['color', 'zone', 'max_drones']
@@ -452,6 +455,7 @@ class ParserManager:
         tokens = meta_data_parts.replace("=", " = ").split()
 
         i = 0
+        numeric_keys = {"max_drones", "max_link_capacity"}
         while i < len(tokens):
             if i + 2 >= len(tokens):
                 raise ValueError(
@@ -478,10 +482,7 @@ class ParserManager:
                         f"Invalid zone value: {value}. "
                         f"Valid values are {[e.value for e in ZoneType]}"
                     )
-            else:
-                obj['zone'] = ZoneType.NORMAL.value
-
-            if key == "max_drones":
+            elif key in numeric_keys:
                 try:
                     obj[key] = int(value)
                 except ValueError:
@@ -489,7 +490,7 @@ class ParserManager:
                         f"Invalid value for {key}: {value}. "
                         "Must be an integer."
                     )
-            if key != 'max_drones' or key != 'zone':
+            else:
                 obj[key] = value
 
             i += 3

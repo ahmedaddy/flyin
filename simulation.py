@@ -25,8 +25,12 @@ class Simulation:
         drones_zones = {zone_name: 0 for zone_name in graph.zones.keys()}
         drones_zones[start_hub_id] = nb_drones
         turns = 1
+        drones_positions = {drone.id: start_hub_id for drone in drones}
+        history = []
+        history.append(dict(drones_positions))
         # print(drones_zones)
         while drones_zones[end_hub_id] != nb_drones:
+            moved_this_turn = False
             print(f"Turn {turns}:", end=" ")
             connection_capacity = {
                 (zone1, zone2): 0
@@ -41,19 +45,17 @@ class Simulation:
 
                 next_zone = drone.path[drone.position + 1]
                 if drone.in_transit:
-                    if (
-                        drones_zones[drone.transit_destination]
-                        < graph.zones[drone.transit_destination].capacity
-                    ):
-                        drone.in_transit = False
-                        drone.move()
-                        drones_zones[drone.zone] += 1
-                        print(
-                            f"D{drone.id}-{drone.transit_destination}", end=" "
-                            )
-                        drone.transit_destination = None
-                        # print(drones_zones)
-                        continue
+                    drone.in_transit = False
+                    drone.move()
+                    drones_zones[drone.zone] += 1
+                    moved_this_turn = True
+                    print(
+                        f"D{drone.id}-{drone.transit_destination}", end=" "
+                        )
+                    drone.transit_destination = None
+                    drones_positions[drone.id] = drone.zone
+                    # print(drones_zones)
+                    continue
                 conn_max_capacity = 0
                 for link in graph.connections[drone.zone]:
                     if link.neighbor == next_zone:
@@ -70,11 +72,14 @@ class Simulation:
                         # print(connection_capacity[(drone.zone, next_zone)])
 
                         # print(conn_max_capacity)
+                        current_zone = drone.zone
                         drone.in_transit = True
                         drone.transit_destination = next_zone
                         connection_capacity[(drone.zone, next_zone)] += 1
-                        drones_zones[drone.zone] += 1
-                        print(f"D{drone.id}-{drone.zone}-{next_zone}", end=" ")
+                        drones_zones[drone.zone] -= 1
+                        moved_this_turn = True
+                        drones_positions[drone.id] = f"{current_zone}-{next_zone}"
+                        print(f"D{drone.id}-{current_zone}-{next_zone}", end=" ")
 
                 else:
                     if (
@@ -87,12 +92,20 @@ class Simulation:
                         connection_capacity[(drone.zone, next_zone)] += 1
                         drones_zones[drone.zone] -= 1
                         drone.move()
+                        moved_this_turn = True
                         print(f"D{drone.id}-{drone.zone}", end=" ")
+                        drones_positions[drone.id] = drone.zone
                         drones_zones[next_zone] += 1
                         # print(drones_zones)
                     else:
                         continue
                 # print(connection_capacity)
-
+            history.append(dict(drones_positions))
             print()
+            if not moved_this_turn:
+                raise ValueError(
+                    "Simulation deadlock: no drone can move with current "
+                    "path/capacity constraints."
+                )
             turns += 1
+        return history

@@ -40,12 +40,11 @@ class HubType(Enum):
 class ZoneFactory:
     @staticmethod
     def create(hub_type: HubType, base: dict):
-        # print(base)
         return Zone(
             _id=base["id"],
             x=base["x"],
             y=base["y"],
-            capacity=base['max_drones'] if 'max_drones' in base else 1,
+            capacity=int(base['max_drones']),
             hub_type=hub_type,
             color=base['color'] if 'color' in base else None,
             z_type=base['zone'] if 'zone' in base else ZoneType.NORMAL.value

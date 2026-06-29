@@ -1,10 +1,9 @@
-PYTHON = python3
-PIP = pip3
+PYTHON = python
 MAIN = main.py
 MAP = map.txt
 
 install:
-		$(PIP) install -r requirements.txt
+		pip install -r requirements.txt
 
 run:
 		$(PYTHON) $(MAIN) $(MAP)
